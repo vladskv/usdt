@@ -1,0 +1,33 @@
+type issuet @entity {
+  id: ID!
+}
+type redeemt @entity {
+  id: ID!
+}
+type deprecatet @entity {
+  id: ID!
+}
+type paramst @entity {
+  id: ID!
+}
+type destroyedblackfundst @entity {
+  id: ID!
+}
+type addedblacklistt @entity {
+  id: ID!
+}
+type removedblacklistt @entity {
+  id: ID!
+}
+type approvalt @entity {
+  id: ID!
+}
+type transfert @entity {
+  id: ID!
+}
+type pauset @entity {
+  id: ID!
+}
+type unpauset @entity {
+  id: ID!
+}
