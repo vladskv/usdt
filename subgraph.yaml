@@ -16,15 +16,11 @@ dataSources:
       entities:
         - Issue
         - Redeem
-        - Deprecate
-        - Params
         - DestroyedBlackFunds
         - AddedBlackList
         - RemovedBlackList
         - Approval
         - Transfer
-        - Pause
-        - Unpause
       abis:
         - name: usdt
           file: ./abis/usdt.json
@@ -33,10 +29,6 @@ dataSources:
           handler: handleIssue
         - event: Redeem(uint256)
           handler: handleRedeem
-        - event: Deprecate(address)
-          handler: handleDeprecate
-        - event: Params(uint256,uint256)
-          handler: handleParams
         - event: DestroyedBlackFunds(address,uint256)
           handler: handleDestroyedBlackFunds
         - event: AddedBlackList(address)
@@ -47,8 +39,4 @@ dataSources:
           handler: handleApproval
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-        - event: Pause()
-          handler: handlePause
-        - event: Unpause()
-          handler: handleUnpause
       file: ./src/mapping.ts

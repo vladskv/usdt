@@ -1,33 +1,59 @@
-type issuet @entity {
+type issuance @entity {
+  "USDT tokens issuance tx hash"
   id: ID!
+  "Issuance amount"
+  amount: BigInt!
 }
-type redeemt @entity {
+type redeem @entity {
+  "USDT tokens redeem tx hash"
   id: ID!
+  "Redeem amount"
+  amount: BigInt!
 }
-type deprecatet @entity {
+
+type client @entity {
+  "USDT holder address"
   id: ID!
+  "If address is blacklisted"
+  blacklisted: Boolean!
+  "How many transfers were made by the client"
+  transferscount: BigInt!
+  "Transfers sent by the client"
+  transfers_sent: [transfer!]! @derivedFrom(field: "from")
+  "Transfers recieved by the client"
+  transfers_recieved: [transfer!]! @derivedFrom(field: "to")
+
 }
-type paramst @entity {
+type blackFundsDestroy @entity {
+  "Tx hash of black funds destroy operation"
   id: ID!
+  "Destroyed amount"
+  amount:BigInt!
+  "Address which funds were destroyed"
+  client:client!
 }
-type destroyedblackfundst @entity {
+
+type approval @entity {
+  "Tx hash of spent approvals"
   id: ID!
+  "Owner address"
+  owner: client!
+  "Spender address"
+  spender: client!
+  "Approved value"
+  value: BigInt!
+
 }
-type addedblacklistt @entity {
+type transfer @entity {
+  "Tx hash of transfer"
   id: ID!
+  "Timestamp of transfer"
+  timestamp:BigInt!
+  "Sender"
+  from: client!
+  "Reciever"
+  to: client!
+  "Transfer amount"
+  amount: BigInt!
 }
-type removedblacklistt @entity {
-  id: ID!
-}
-type approvalt @entity {
-  id: ID!
-}
-type transfert @entity {
-  id: ID!
-}
-type pauset @entity {
-  id: ID!
-}
-type unpauset @entity {
-  id: ID!
-}
+

@@ -1,125 +1,99 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { BigInt, Address } from "@graphprotocol/graph-ts"
 import {
   usdt,
   Issue,
   Redeem,
-  Deprecate,
-  Params,
   DestroyedBlackFunds,
   AddedBlackList,
   RemovedBlackList,
   Approval,
   Transfer,
-  Pause,
-  Unpause
-} from "../generated/usdt/usdt"
-import { issuet, redeemt, deprecatet, paramst, destroyedblackfundst, addedblacklistt, removedblacklistt, approvalt, transfert, pauset, unpauset,  } from "../generated/schema"
 
+} from "../generated/usdt/usdt"
+import { client,issuance, redeem, approval, blackFundsDestroy, transfer  } from "../generated/schema"
 
 export function handleIssue(event: Issue): void {
-  let entity = issuet.load(event.transaction.hash.toHex())
+  let entity = issuance.load(event.transaction.hash.toHex())
   if (entity == null) {
-    entity = new issuet(event.transaction.hash.toHex())
+    entity = new issuance(event.transaction.hash.toHex())
   }
+  entity.amount=event.params.amount
   entity.save()
 }
 
 export function handleRedeem(event: Redeem): void {
-  let entity = redeemt.load(event.transaction.hash.toHex())
+  let entity = redeem.load(event.transaction.hash.toHex())
   if (entity == null) {
-    entity = new redeemt(event.transaction.hash.toHex())
+    entity = new redeem(event.transaction.hash.toHex())
   }
-  entity.save()
-}
-
-export function handleDeprecate(event: Deprecate): void {
-  let entity = deprecatet.load(event.transaction.hash.toHex())
-  if (entity == null) {
-    entity = new deprecatet(event.transaction.hash.toHex())
-  }
-  entity.save()
-}
-
-export function handleParams(event: Params): void {
-  let entity = paramst.load(event.transaction.hash.toHex())
-  if (entity == null) {
-    entity = new paramst(event.transaction.hash.toHex())
-  }
+  entity.amount=event.params.amount
   entity.save()
 }
 
 export function handleDestroyedBlackFunds(event: DestroyedBlackFunds): void {
-  let entity = destroyedblackfundst.load(event.transaction.hash.toHex())
+  let entity = blackFundsDestroy.load(event.transaction.hash.toHex())
   if (entity == null) {
-    entity = new destroyedblackfundst(event.transaction.hash.toHex())
+    entity = new blackFundsDestroy(event.transaction.hash.toHex())
   }
+  let user=load_or_create_client(event.params._blackListedUser)
+  entity.amount=event.params._balance
+  entity.client=user.id
   entity.save()
 }
 
 export function handleAddedBlackList(event: AddedBlackList): void {
-  let entity = addedblacklistt.load(event.transaction.hash.toHex())
-  if (entity == null) {
-    entity = new addedblacklistt(event.transaction.hash.toHex())
-  }
-  entity.save()
+  let Client=load_or_create_client(event.params._user)
+  Client.blacklisted=true
+  Client.save()
+
 }
 
 export function handleRemovedBlackList(event: RemovedBlackList): void {
-  let entity = removedblacklistt.load(event.transaction.hash.toHex())
-  if (entity == null) {
-    entity = new removedblacklistt(event.transaction.hash.toHex())
-  }
-  entity.save()
+  let Client=load_or_create_client(event.params._user)
+  Client.blacklisted=false
+  Client.save()
 }
 
 export function handleApproval(event: Approval): void {
-  let entity = approvalt.load(event.transaction.hash.toHex())
+  let own=load_or_create_client(event.params.owner)
+  let spender=load_or_create_client(event.params.owner)
+  let entity = approval.load(event.transaction.hash.toHex())
   if (entity == null) {
-    entity = new approvalt(event.transaction.hash.toHex())
+    entity = new approval(event.transaction.hash.toHex())
   }
+  entity.owner=own.id
+  entity.spender=spender.id
+  entity.value=event.params.value
   entity.save()
 }
 
 export function handleTransfer(event: Transfer): void {
-  let entity = transfert.load(event.transaction.hash.toHex())
+  let sender = load_or_create_client(event.params.from)
+  sender.transferscount=sender.transferscount+BigInt.fromI32(1)
+  sender.save()
+  let reciever = load_or_create_client(event.params.to)
+  let entity = transfer.load(event.transaction.hash.toHex())
   if (entity == null) {
-    entity = new transfert(event.transaction.hash.toHex())
+    entity = new transfer(event.transaction.hash.toHex())
   }
+  entity.amount=event.params.value
+  entity.from=sender.id
+  entity.to=reciever.id
+  entity.timestamp=event.block.timestamp
   entity.save()
 }
 
-export function handlePause(event: Pause): void {
-  let entity = pauset.load(event.transaction.hash.toHex())
-  if (entity == null) {
-    entity = new pauset(event.transaction.hash.toHex())
+
+
+
+export function load_or_create_client(address: Address): client {
+  let Client = client.load(address.toHexString())
+  if (Client == null) {
+    Client = new client(address.toHexString())
+    Client.blacklisted=false
+    Client.transferscount=BigInt.fromI32(0)
+    Client.save();
   }
-  entity.save()
+  return Client as client;
 }
 
-export function handleUnpause(event: Unpause): void {
-  let entity = unpauset.load(event.transaction.hash.toHex())
-  if (entity == null) {
-    entity = new unpauset(event.transaction.hash.toHex())
-  }
-  entity.save()
-}
-
-// - contract.name(...)
-// - contract.deprecated(...)
-// - contract.totalSupply(...)
-// - contract.upgradedAddress(...)
-// - contract.balances(...)
-// - contract.decimals(...)
-// - contract.maximumFee(...)
-// - contract._totalSupply(...)
-// - contract.getBlackListStatus(...)
-// - contract.allowed(...)
-// - contract.paused(...)
-// - contract.balanceOf(...)
-// - contract.getOwner(...)
-// - contract.owner(...)
-// - contract.symbol(...)
-// - contract.allowance(...)
-// - contract.basisPointsRate(...)
-// - contract.isBlackListed(...)
-// - contract.MAX_UINT(...)
